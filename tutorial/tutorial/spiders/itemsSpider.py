@@ -16,6 +16,14 @@ class ItemsSpider(scrapy.Spider):
         product_page = response.css('section.product-page')
         yield {
             'name': product_page.css('section.page-head h1::text').get(),
+            'size': product_page.css('div.product-main-info p::text').get(),
             'code': product_page.css('div.product-main-info h4::text').get(),
             'pics': product_page.css('div.gallery-thumb img::attr(data-zoom-image)').getall(),
+            'params': product_page.css('div.catalog-item-info p span::text').getall()
+        }
+
+        product_details = response.css('section.product-details')
+        yield {
+            'tabs': product_details.css('ul.nav li a::attr(href)').get(),
+            'text': product_details.css('div.tab-content div#description::text').get(),
         }
