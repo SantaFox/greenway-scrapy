@@ -5,7 +5,16 @@ class ItemsSpider(scrapy.Spider):
     name = "items"
 
     start_urls = [
+        'https://www.mygreenway.eu/products/Kits/',
         'https://www.mygreenway.eu/products/Aquamagic/',
+        'https://www.mygreenway.eu/products/Aquamatic/',
+        'https://www.mygreenway.eu/products/BioTrim/',
+        'https://www.mygreenway.eu/products/Plush/',
+        'https://www.mygreenway.eu/products/accessories/',
+        'https://www.mygreenway.eu/products/books/',
+        'https://www.mygreenway.eu/products/Sharme-Essential/',
+        'https://www.mygreenway.eu/products/Gift-sets/',
+
     ]
 
     def parse(self, response):
@@ -25,5 +34,5 @@ class ItemsSpider(scrapy.Spider):
         product_details = response.css('section.product-details')
         yield {
             'tabs': product_details.css('ul.nav li a::attr(href)').get(),
-            'text': product_details.css('div.tab-content div#description::text').get(),
+            'text': product_details.css('div.tab-content div#description').get(),
         }
