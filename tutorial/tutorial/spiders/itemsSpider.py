@@ -5,15 +5,15 @@ class ItemsSpider(scrapy.Spider):
     name = "items"
 
     start_urls = [
-        # 'https://www.mygreenway.eu/products/Kits/',
-        # 'https://www.mygreenway.eu/products/Aquamagic/',
-        # 'https://www.mygreenway.eu/products/Aquamatic/',
-        # 'https://www.mygreenway.eu/products/BioTrim/',
-        # 'https://www.mygreenway.eu/products/Plush/',
-        # 'https://www.mygreenway.eu/products/accessories/',
-        # 'https://www.mygreenway.eu/products/books/',
-        # 'https://www.mygreenway.eu/products/Sharme-Essential/',
-        # 'https://www.mygreenway.eu/products/Gift-sets/',
+        'https://www.mygreenway.eu/products/Kits/',
+        'https://www.mygreenway.eu/products/Aquamagic/',
+        'https://www.mygreenway.eu/products/Aquamatic/',
+        'https://www.mygreenway.eu/products/BioTrim/',
+        'https://www.mygreenway.eu/products/Plush/',
+        'https://www.mygreenway.eu/products/accessories/',
+        'https://www.mygreenway.eu/products/books/',
+        'https://www.mygreenway.eu/products/Sharme-Essential/',
+        'https://www.mygreenway.eu/products/Gift-sets/',
         'https://www.mygreenway.eu/products/TeaVitall/',
     ]
 
@@ -35,11 +35,9 @@ class ItemsSpider(scrapy.Spider):
             pics.add(response.urljoin(pic))
 
         tabs = product_details.css('ul.nav li a::attr(href)').getall()
-        texts = set()
+        texts = {}
         for tab in tabs:
-            texts.add(
-                product_details.css('div.tab-content div' + tab).get()
-            )
+            texts[tab] = product_details.css('div.tab-content div' + tab + ' > *').getall()
 
         yield {
             'name': name,
