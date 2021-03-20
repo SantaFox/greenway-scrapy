@@ -28,7 +28,11 @@ class ItemsSpider(scrapy.Spider):
         name = product_page.css('section.page-head h1::text').get()
         spec = product_page.css('div.product-main-info p::text').get()
         code = product_page.css('div.product-main-info h4::text').get()
-        params = product_page.css('div.catalog-item-info p span::text').getall()
+
+        params_raw = product_page.css('div.catalog-item-info p span::text').getall()
+        params = {}
+        for i in range(int(len(params_raw)/2)):
+            params[params_raw[i*2]] = params_raw[i*2+1]
 
         pics = {response.urljoin(product_page.css('div.gallery-slide img::attr(data-zoom-image)').get())}
         for pic in product_page.css('div.gallery-thumb img::attr(data-zoom-image)').getall():
@@ -43,6 +47,7 @@ class ItemsSpider(scrapy.Spider):
             'name': name,
             'spec': spec,
             'code': code,
+            'price': params['Price'],
             'pics': pics,
             'params': params,
             'texts': texts,
