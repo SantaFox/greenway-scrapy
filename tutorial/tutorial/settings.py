@@ -86,3 +86,13 @@ ROBOTSTXT_OBEY = True
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+from scrapy.exporters import JsonLinesItemExporter
+class MyJsonLinesItemExporter(JsonLinesItemExporter):
+    def __init__(self, file, **kwargs):
+        super(MyJsonLinesItemExporter, self).__init__(file, ensure_ascii=False, **kwargs)
+
+FEED_EXPORTERS = {
+    'jsonlines': 'tutorial.settings.MyJsonLinesItemExporter',
+    'jl': 'tutorial.settings.MyJsonLinesItemExporter',
+}
