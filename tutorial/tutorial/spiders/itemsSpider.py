@@ -25,18 +25,18 @@ class ItemsSpider(scrapy.Spider):
         product_page = response.css('section.product-page')
         product_details = response.css('section.product-details')
 
-        name = product_page.css('section.page-head h1::text').get()
-        spec = product_page.css('div.product-main-info p::text').get()
-        code = product_page.css('div.product-main-info h4::text').get()
+        name = product_page.css('section.page-head h1::text').get().strip()
+        spec = product_page.css('div.product-main-info p::text').get().strip()
+        code = product_page.css('div.product-main-info h4::text').get().strip()
 
         params_raw = product_page.css('div.catalog-item-info p span::text').getall()
         params = {}
         for i in range(int(len(params_raw)/2)):
-            params[params_raw[i*2]] = params_raw[i*2+1]
+            params[params_raw[i*2]] = params_raw[i*2+1].strip()
 
-        pics = {response.urljoin(product_page.css('div.gallery-slide img::attr(data-zoom-image)').get())}
+        pics = {response.urljoin(product_page.css('div.gallery-slide img::attr(data-zoom-image)').get().strip())}
         for pic in product_page.css('div.gallery-thumb img::attr(data-zoom-image)').getall():
-            pics.add(response.urljoin(pic))
+            pics.add(response.urljoin(pic.strip()))
 
         tabs = product_details.css('ul.nav li a::attr(href)').getall()
         texts = {}
