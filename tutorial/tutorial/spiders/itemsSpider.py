@@ -20,7 +20,7 @@ class ItemsSpider(scrapy.Spider):
 
     def request(self, url, callback):
         """
-         wrapper for scrapy.request
+         Wrapper for scrapy.request
         """
         request = scrapy.Request(url=url, callback=callback)
 
@@ -28,11 +28,11 @@ class ItemsSpider(scrapy.Spider):
         cyprus_en = {'CCLLang': 'en_US', 'CCLCity': '242683', 'CCLID': 'eu', 'CCLCountry': '44', 'CCLCityName': 'Республика Кипр'}
         russia_ru = {'CCLLang': 'ru_RU', 'CCLCity': '183527', 'CCLID': 'ru', 'CCLCountry': '1', 'CCLCityName': 'Москва'}
         russia_en = {'CCLLang': 'en_US', 'CCLCity': '183527', 'CCLID': 'ru', 'CCLCountry': '1', 'CCLCityName': 'Moscow'}
-        request.cookies.update(cyprus_ru)
+        request.cookies.update(cyprus_en)
 
         request.headers['User-Agent'] = (
-            'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, '
-            'like Gecko) Chrome/45.0.2454.85 Safari/537.36')
+            'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 '
+            '(KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36')
         return request
 
     def start_requests(self):
@@ -77,7 +77,7 @@ class ItemsSpider(scrapy.Spider):
         price_headers = {'Price', 'Partner price', 'Цена', 'Цена партнёра'}
         for key in params.keys():
             if key in price_headers:
-                price = Decimal(params[key].split()[0])
+                price = params[key].split()[0]
 
         tabs = product_details.css('ul.nav li a::attr(href)').getall()
         texts = {}
