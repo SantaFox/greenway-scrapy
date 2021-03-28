@@ -17,6 +17,27 @@ class ItemsSpider(scrapy.Spider):
         'https://www.mygreenway.eu/products/TeaVitall/',
     ]
 
+    def request(self, url, callback):
+        """
+         wrapper for scrapy.request
+        """
+        request = scrapy.Request(url=url, callback=callback)
+
+        cyprus_ru = {'CCLLang': 'ru_RU', 'CCLCity': '242683', 'CCLID': 'eu', 'CCLCountry': '44', 'CCLCityName': 'Республика Кипр'}
+        cyprus_en = {'CCLLang': 'en_US', 'CCLCity': '242683', 'CCLID': 'eu', 'CCLCountry': '44', 'CCLCityName': 'Республика Кипр'}
+        russia_ru = {'CCLLang': 'ru_RU', 'CCLCity': '183527', 'CCLID': 'ru', 'CCLCountry': '1', 'CCLCityName': 'Москва'}
+        russia_en = {'CCLLang': 'en_US', 'CCLCity': '183527', 'CCLID': 'ru', 'CCLCountry': '1', 'CCLCityName': 'Moscow'}
+        request.cookies.update(cyprus_ru)
+
+        request.headers['User-Agent'] = (
+            'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, '
+            'like Gecko) Chrome/45.0.2454.85 Safari/537.36')
+        return request
+
+    def start_requests(self):
+        for i, url in enumerate(self.start_urls):
+            yield self.request(url, self.parse_section)
+
     def parse(self, response):
         items_links = response.css('div.catalog-item a.catalog-item-title::attr(href)')
         yield from response.follow_all(items_links, self.parse_item)
