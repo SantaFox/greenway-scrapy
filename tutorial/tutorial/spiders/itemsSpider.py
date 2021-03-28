@@ -1,4 +1,5 @@
 import scrapy
+from decimal import Decimal
 
 
 class ItemsSpider(scrapy.Spider):
@@ -13,7 +14,7 @@ class ItemsSpider(scrapy.Spider):
         'https://www.mygreenway.eu/products/accessories/',
         'https://www.mygreenway.eu/products/books/',
         'https://www.mygreenway.eu/products/Sharme-Essential/',
-        'https://www.mygreenway.eu/products/Gift-sets/',
+        # 'https://www.mygreenway.eu/products/Gift-sets/',          почему-то пропала в марте 2021
         'https://www.mygreenway.eu/products/TeaVitall/',
     ]
 
@@ -42,33 +43,52 @@ class ItemsSpider(scrapy.Spider):
         items_links = response.css('div.catalog-item a.catalog-item-title::attr(href)')
         yield from response.follow_all(items_links, self.parse_item)
 
+    def parse_section(self, response):
+        items_links = response.css('div.catalog-item a.catalog-item-title::attr(href)')
+        yield from response.follow_all(items_links, self.parse_item)
+
     def parse_item(self, response):
         product_page = response.css('section.product-page')
         product_details = response.css('section.product-details')
 
-        name = product_page.css('section.page-head h1::text').get().strip()
-        spec = product_page.css('div.product-main-info p::text').get().strip()
-        code = product_page.css('div.product-main-info h4::text').get().strip()
+        name = product_page.css('section.page-head h1::text').get()
+        spec = product_page.css('div.product-main-info p::text').get()
+        code = product_page.css('div.product-main-info h4::text').get()
+
+        if name is not None:
+            name = name.strip()
+        if spec is not None:
+            spec = spec.strip()
+        if code is not None:
+            code = code.strip()
+
+        pic_fore = product_page.css('div.gallery-slide img::attr(data-zoom-image)').get()
+        if pic_fore is not None:
+            pic_fore = pic_fore.strip()
+        pics = {response.urljoin(pic_fore)}
+        for pic in product_page.css('div.gallery-thumb img::attr(data-zoom-image)').getall():
+            pics.add(response.urljoin(pic.strip()))
 
         params_raw = product_page.css('div.catalog-item-info p span::text').getall()
         params = {}
-        for i in range(int(len(params_raw)/2)):
-            params[params_raw[i*2]] = params_raw[i*2+1].strip()
+        for i in range(int(len(params_raw) / 2)):
+            params[params_raw[i * 2].strip()] = params_raw[i * 2 + 1].strip()
 
-        pics = {response.urljoin(product_page.css('div.gallery-slide img::attr(data-zoom-image)').get().strip())}
-        for pic in product_page.css('div.gallery-thumb img::attr(data-zoom-image)').getall():
-            pics.add(response.urljoin(pic.strip()))
+        price_headers = {'Price', 'Partner price', 'Цена', 'Цена партнёра'}
+        for key in params.keys():
+            if key in price_headers:
+                price = Decimal(params[key].split()[0])
 
         tabs = product_details.css('ul.nav li a::attr(href)').getall()
         texts = {}
         for tab in tabs:
-            texts[tab] = product_details.css('div.tab-content div' + tab + ' > *').getall()
+            texts[tab.strip()] = product_details.css('div.tab-content div' + tab.strip() + ' > *').getall()
 
         yield {
             'name': name,
             'spec': spec,
             'code': code,
-            'price': params['Price'],
+            'price': price,
             'pics': pics,
             'params': params,
             'texts': texts,
