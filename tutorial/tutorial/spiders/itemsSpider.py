@@ -1,5 +1,4 @@
 import scrapy
-from decimal import Decimal
 
 
 class ItemsSpider(scrapy.Spider):
@@ -92,4 +91,5 @@ class ItemsSpider(scrapy.Spider):
             'pics': pics,
             'params': params,
             'texts': texts,
+            'image_urls': pics,
         }
