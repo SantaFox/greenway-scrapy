@@ -11,3 +11,5 @@ from itemadapter import ItemAdapter
 class TutorialPipeline:
     def process_item(self, item, spider):
         return item
+
+# https://stackoverflow.com/questions/44481615/python-scrapy-renaming-downloaded-images
