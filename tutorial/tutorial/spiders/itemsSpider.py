@@ -27,7 +27,7 @@ class ItemsSpider(scrapy.Spider):
         cyprus_en = {'CCLLang': 'en_US', 'CCLCity': '242683', 'CCLID': 'eu', 'CCLCountry': '44', 'CCLCityName': 'Республика Кипр'}
         russia_ru = {'CCLLang': 'ru_RU', 'CCLCity': '183527', 'CCLID': 'ru', 'CCLCountry': '1', 'CCLCityName': 'Москва'}
         russia_en = {'CCLLang': 'en_US', 'CCLCity': '183527', 'CCLID': 'ru', 'CCLCountry': '1', 'CCLCityName': 'Moscow'}
-        request.cookies.update(cyprus_en)
+        request.cookies.update(cyprus_ru)
 
         request.headers['User-Agent'] = (
             'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 '
@@ -80,8 +80,13 @@ class ItemsSpider(scrapy.Spider):
 
         tabs = product_details.css('ul.nav li a::attr(href)').getall()
         texts = {}
-        for tab in tabs:
-            texts[tab.strip()] = product_details.css('div.tab-content div' + tab.strip() + ' > *').getall()
+        for tab_name in tabs:
+            tab = product_details.css('div.tab-content div' + tab_name.strip())
+            tab_nodes = tab.css('div > *').getall()
+            tab_text = tab.css('::text').get().strip()
+            if tab_text.strip() != '':
+                tab_nodes.append(tab_text)
+            texts[tab_name.strip()] = tab_nodes
 
         yield {
             'name': name,
@@ -91,5 +96,5 @@ class ItemsSpider(scrapy.Spider):
             'pics': pics,
             'params': params,
             'texts': texts,
-            'image_urls': pics,
+            # 'image_urls': pics,
         }
